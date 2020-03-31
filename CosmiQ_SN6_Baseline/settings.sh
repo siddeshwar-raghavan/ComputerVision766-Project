@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dstdir=/root
+dstdir=/home/siddeshwarraghavan/results
 
 settings="\
 --rotationfilelocal $dstdir/SAR_orientations.txt \
