@@ -2,12 +2,12 @@
 
 source activate solaris
 
-traindatapath=$1
+traindatapath=$/home/siddeshwarraghavan/data/train
 traindataargs="\
---sardir $traindatapath/SAR-Intensity \
---opticaldir $traindatapath/PS-RGB \
---labeldir $traindatapath/geojson_buildings \
---rotationfile $traindatapath/SummaryData/SAR_orientations.txt \
+--sardir $/home/siddeshwarraghavan/data/train/SAR-Intensity \
+--opticaldir $/home/siddeshwarraghavan/data/train/PS-RGB \
+--labeldir $/home/siddeshwarraghavan/data/train/geojson_buildings \
+--rotationfile $/home/siddeshwarraghavan/data/train/SummaryData/SAR_orientations.txt \
 "
 
 source settings.sh
