@@ -152,7 +152,8 @@ def pretrain(args):
     if args.opticalprocdir is not None:
         folders.append(args.opticalprocdir)
     for folder in folders:
-        makeemptyfolder(folder)
+        if not args.saronlytrain:
+            makeemptyfolder(folder)
     pathlib.Path(args.modeldir).mkdir(exist_ok=True)
 
     #Look up how to rotate masks and images, if enabled
@@ -220,7 +221,7 @@ def pretrain(args):
 
     #Write reference CSVs for training
     for i in range(numgroups+1):
-        print( '%i: %i' % (i, len(combodf[combodf['group']==i])))
+        # print( '%i: %i' % (i, len(combodf[combodf['group']==i])))
     validationgroup = numgroups - 1
     traindf = combodf[combodf['group'] != validationgroup]
     validdf = combodf[combodf['group'] == validationgroup]
@@ -491,11 +492,12 @@ def train(args):
 
     #Optionally start by training on optical imagery for transfer learning
     if args.transferoptical:
-        print('Training on Optical: Start')
-        config = sol.utils.config.parse(args.opticalyamlpath)
-        trainer = sol.nets.train.Trainer(config,
-                                         custom_model_dict=optical_dict)
-        trainer.train()
+        if not args.saronlytrain:
+            print('Training on Optical: Start')
+            config = sol.utils.config.parse(args.opticalyamlpath)
+            trainer = sol.nets.train.Trainer(config,
+                                             custom_model_dict=optical_dict)
+            trainer.train()
 
         #Select best-performing optical imagery model
         if not args.uselastmodel:
@@ -507,7 +509,7 @@ def train(args):
             modelfile = modelfiles[latestindex]
         else:
             modelfile = os.path.join(args.modeldir, 'opticallast.model')
-        print(modelfile)
+        # print(modelfile)
         destfile = os.path.join(args.modeldir, 'optical.model')
         shutil.copyfile(modelfile, destfile, follow_symlinks=True)
         print('Training on Optical: End')
@@ -585,7 +587,7 @@ def test(args):
     timestamps = [os.path.getmtime(modelfile) for modelfile in modelfiles]
     latestindex = timestamps.index(max(timestamps))
     modelfile = modelfiles[latestindex]
-    print(modelfile)
+    # print(modelfile)
     if not args.uselastmodel:
         destfile = os.path.join(args.modeldir, 'last.model')
         shutil.copyfile(modelfile, destfile, follow_symlinks=True)
@@ -774,6 +776,8 @@ if __name__ == '__main__':
                         help='Do not overwrite last model with best model')
     parser.add_argument('--earlycutoff',
                         help='Limit tiles used, for debugging purposes')
+    parser.add_argument('--saronlytrain', action='store_true',
+                        help='Train using SAR files, use previous EO weights')
     args = parser.parse_args(sys.argv[1:])
 
     if args.pretrain:
