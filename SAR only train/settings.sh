@@ -23,4 +23,5 @@ settings="\
 --transferoptical \
 --mintrainsize 20 \
 --mintestsize 80 \
+--saronlytrain \
 "
